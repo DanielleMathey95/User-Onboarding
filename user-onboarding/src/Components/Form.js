@@ -33,7 +33,18 @@ export default function Form() {
       console.log('valid?', valid);
       setIsButtonDisabled(!valid);
     });
-  }, [formState])
+  }, [formState]);
+
+  const validateChange = event => {
+    yup.reach(formSchema, event.target.name)
+       .validate(event.target.value)
+       .then(valid => {
+         setErrors({...errors, [event.target.name]: ''});
+       })
+       .catch(error => {
+         setErrors({...errors, [event.target.name]: error.errors[0] });
+       });
+  }
 
   // onSubmit function
   const formSubmit = event => {
@@ -43,12 +54,14 @@ export default function Form() {
 
 //onChange function
   const inputChange = event => {
+    event.persist();
     const newFormData = {
       ...formState,
       [event.target.name] : event.target.type === "checkbox" ? event.target.checked : event.target.value
     };
-    setFormState(newFormData)
-  }
+    validateChange(event);
+    setFormState(newFormData);
+  };
 
   return (
     <form onSubmit={formSubmit}>
@@ -57,22 +70,31 @@ export default function Form() {
           id="name"
           type="text"
           name="name"
+          value={formState.name}
           onChange={inputChange} />
+          {errors.name.length > 0 ? <p className="error">{errors.name}</p> : null}
       </label>
+
       <label htmlFor="email">Email
         <input 
           id="email"
           type="email"
           name="email"
+          value={formState.email}
           onChange={inputChange} />
+          {errors.email.length > 0 ? <p className="error">{errors.email}</p> : null}
       </label>
+
       <label htmlFor="password">Password
         <input 
           id="password"
           type="password"
           name="password"
+          value={formState.password}
           onChange={inputChange} />
+          {errors.password.length < 8 ? <p className="error">{errors.password}</p> : null}
       </label>
+
       <label htmlFor="terms">Terms & Conditions
         <input 
           type="checkbox"
@@ -80,7 +102,9 @@ export default function Form() {
           cheked={formState.terms}
           onChange={inputChange} />
       </label>
+
       <button disabled={isButtonDisabled} type="submit">Submit</button>
+
     </form>
   )
 }
