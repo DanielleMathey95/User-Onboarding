@@ -19,6 +19,8 @@ export default function Form() {
     terms: ''
   });
 
+  const [isButtonDisabled, setIsButtonDisabled] = useState(true)
+
   const formSchema = yup.object().shape({
     name: yup.string().required("Name is a required field"),
     email: yup.string().email("Must be a valid email address").required(),
@@ -29,9 +31,17 @@ export default function Form() {
   useEffect(() => {
     formSchema.isValid(formState).then(valid => {
       console.log('valid?', valid);
-    })
+      setIsButtonDisabled(!valid);
+    });
   }, [formState])
 
+  // onSubmit function
+  const formSubmit = event => {
+    event.preventDefault();
+    console.log("Form submitted!");
+  }
+
+//onChange function
   const inputChange = event => {
     const newFormData = {
       ...formState,
@@ -39,4 +49,39 @@ export default function Form() {
     };
     setFormState(newFormData)
   }
+
+  return (
+    <form onSubmit={formSubmit}>
+      <label htmlFor="name">Name
+        <input 
+          id="name"
+          type="text"
+          name="name"
+          onChange={inputChange} />
+      </label>
+      <label htmlFor="email">Email
+        <input 
+          id="email"
+          type="email"
+          name="email"
+          onChange={inputChange} />
+      </label>
+      <label htmlFor="password">Password
+        <input 
+          id="password"
+          type="password"
+          name="password"
+          onChange={inputChange} />
+      </label>
+      <label htmlFor="terms">Terms & Conditions
+        <input 
+          type="checkbox"
+          name="terms"
+          cheked={formState.terms}
+          onChange={inputChange} />
+      </label>
+      <button disabled={isButtonDisabled} type="submit">Submit</button>
+    </form>
+  )
 }
+
