@@ -19,7 +19,9 @@ export default function Form() {
     terms: ''
   });
 
-  const [isButtonDisabled, setIsButtonDisabled] = useState(true)
+  const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+
+  const [users, setUsers] = useState([]);
 
   const formSchema = yup.object().shape({
     name: yup.string().required("Name is a required field"),
@@ -49,8 +51,19 @@ export default function Form() {
   // onSubmit function
   const formSubmit = event => {
     event.preventDefault();
-    console.log("Form submitted!");
-  }
+    axios
+    .post('https://reqres.in/api/users', formState)
+    .then(response => {
+      setUsers(response.data);
+      setFormState({
+        name: "",
+          email: "",
+          password: "",
+          terms: ""
+      }); 
+    })
+   .catch(error => console.log(error.response));
+  };
 
 //onChange function
   const inputChange = event => {
@@ -95,7 +108,7 @@ export default function Form() {
           value={formState.password}
           data-cy="password"
           onChange={inputChange} />
-          {errors.password.length < 8 ? <p className="error">{errors.password}</p> : null}
+          {errors.password.length > 0 ? <p className="error">{errors.password}</p> : null}
       </label>
 
       <label htmlFor="terms">Terms & Conditions
@@ -105,7 +118,7 @@ export default function Form() {
           cheked={formState.terms}
           onChange={inputChange} />
       </label>
-
+      <pre>{JSON.stringify(users, null, 2)}</pre>
       <button disabled={isButtonDisabled} type="submit">Submit</button>
 
     </form>
