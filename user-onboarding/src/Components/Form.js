@@ -52,7 +52,7 @@ export default function Form() {
   const formSubmit = event => {
     event.preventDefault();
     axios
-    .post("https://reqres.in/api/users", formState)
+    .post('https://reqres.in/api/users', formState)
     .then(response => {
       setUsers(response.data);
       setFormState({
